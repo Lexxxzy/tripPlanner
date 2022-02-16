@@ -1,5 +1,8 @@
+/* eslint-disable no-console */
 import { createOffer } from './eventOffer';
-export const createTripContent = (point) =>{
+import { createElement } from '../utils';
+const createTripContent = (point) =>{
+
   const {tripType,destination,price,dateTo,fromTime,toTime,isFavorite,offers,timeInPoint,dateFromFormatted} = point;
   const favClassName = isFavorite ? 'event__favorite-btn--active' : 'event__favorite-btn--disabled';
   return (`
@@ -37,5 +40,24 @@ export const createTripContent = (point) =>{
   </div>
 </li>`);
 };
+
+export default class TripContent{
+  constructor() {
+    this._element = null;
+  }
+
+  getElement(point) {
+    if (!this._element) {
+      this._element = createElement(createTripContent(point));
+      console.log(createElement(createTripContent(point)));
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
 
 //this.parentElement.parentElement.remove()

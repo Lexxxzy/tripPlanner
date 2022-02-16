@@ -1,6 +1,8 @@
 /* eslint-disable no-unused-vars */
 import { createOfferForEditPoint } from './offerForEditPoint';
-import { generateOffers,generateDescription, getRandomInteger } from '../mock/point';
+import { generateOffers,generateDescription } from '../mock/point';
+import { getRandomInteger } from '../utils';
+import { createElement } from '../utils.js';
 /*
 3.	Теперь давайте перепишем функцию по созданию шаблона точки маршрута,
 чтобы она на вход принимала данные — объект определённой структуры.
@@ -11,8 +13,7 @@ import { generateOffers,generateDescription, getRandomInteger } from '../mock/po
 корректно отображался с «пустыми» данными.
 
  */
-export const createNewPoint = (point = {}) => {
-  //const {tripType,destination,price,dateFrom,dateTo,fromTime,toTime,isFavorite,offers,timeInPoint,dateFromForm,dateToForm,description} = point;
+const createNewPoint = (point = {}) => {
   const {
     tripType = 'Taxi',
     destination = 'Venice',
@@ -159,3 +160,27 @@ export const createNewPoint = (point = {}) => {
 </li>
 `);
 };
+
+
+export default class NewPoint{
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate(point = {}) {
+    return createNewPoint(point = {});
+  }
+
+  getElement(point = {}) {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate(point = {}));
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
