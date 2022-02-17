@@ -5,8 +5,7 @@ const createTripContent = (point) =>{
 
   const {tripType,destination,price,dateTo,fromTime,toTime,isFavorite,offers,timeInPoint,dateFromFormatted} = point;
   const favClassName = isFavorite ? 'event__favorite-btn--active' : 'event__favorite-btn--disabled';
-  return (`
-<li class="trip-events__item">
+  return (`<li class="trip-events__item">
   <div class="event">
     <time class="event__date" datetime="${dateFromFormatted}">${dateFromFormatted}</time>
     <div class="event__type">
@@ -42,14 +41,18 @@ const createTripContent = (point) =>{
 };
 
 export default class TripContent{
-  constructor() {
+  constructor(point) {
     this._element = null;
+    this.point = point;
   }
 
-  getElement(point) {
+  getTemplate() {
+    return createTripContent(this.point);
+  }
+
+  getElement() {
     if (!this._element) {
-      this._element = createElement(createTripContent(point));
-      console.log(createElement(createTripContent(point)));
+      this._element = createElement(this.getTemplate());
     }
     return this._element;
   }
