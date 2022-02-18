@@ -1,38 +1,15 @@
-import { createTripInfo } from './view/tripInfo';
-import { createMenuInfo } from './view/menu';
-import { createTripFilters } from './view/filters';
-import { createTripSort } from './view/sort';
-import { createTripContent } from './view/content';
-import { createNewPoint } from './view/addNewPoint';
+import TripInfoView from './view/tripInfo';
+import SiteMenuView from './view/menu.js';
+import TripFiltersView from './view/filters';
+import SortView from './view/sort';
+import TripContentView from './view/content';
+import AddEditView from './view/addNewPoint';
 import { generatePoint } from './mock/point';
-import dayjs from 'dayjs';
+import {  RenderPosition, renderElement } from './utils';
 
 
 const POINTS_COUNT = 4;
 const points = new Array(POINTS_COUNT).fill().map(generatePoint);
-
-const allCities = () =>
-{
-  const cities = new Set;
-  const dates = new Set;
-  for (const point of points){
-    cities.add(point.destination);
-    dates.add(new Date(point.dateFrom));
-  }
-  const maxDate=dayjs(new Date(Math.max(...dates))).format('DD MMM');
-  const minDate=dayjs(new Date(Math.min(...dates))).format('DD MMM');
-
-  return {
-    citiesArray: Array.from(cities),
-    max: maxDate,
-    min: minDate,
-  };
-};
-
-export const render = (container, template, place) =>
-{
-  container.insertAdjacentHTML(place, template);
-};
 
 const siteHeaderElement = document.querySelector('header');
 const siteMainElement = document.querySelector('main');
@@ -41,25 +18,21 @@ const siteTripMain = siteHeaderElement.querySelector('.trip-main');
 const siteTripNavigation = siteHeaderElement.querySelector('.trip-controls__navigation');
 const siteTripFilters = siteHeaderElement.querySelector('.trip-controls__filters');
 const siteTripSort = siteMainElement.querySelector('.trip-events');
-//const siteTripContent = siteMainElement.querySelector('.trip-events');
 
-render(siteTripMain, createTripInfo(allCities()), 'afterbegin');
-render(siteTripNavigation, createMenuInfo(), 'beforeend');
-render(siteTripFilters, createTripFilters(), 'beforeend');
-render(siteTripSort, createTripSort(), 'afterbegin');
+
+renderElement(siteTripMain, new TripInfoView().getElement(points),  RenderPosition.AFTERBEGIN);
+renderElement(siteTripNavigation, new SiteMenuView().getElement(), RenderPosition.BEFOREEND);
+renderElement(siteTripFilters, new TripFiltersView().getElement(), RenderPosition.BEFOREEND);
+renderElement(siteTripSort, new SortView().getElement(), RenderPosition.AFTERBEGIN);
 
 //Добаление формы для добавдения новой точки маршрута
-export const siteNewPoint = document.querySelector('.trip-events__list');
+const siteNewPoint = document.querySelector('.trip-events__list');
 
-for (let i = 0; i < POINTS_COUNT; i++) {
-  render(siteNewPoint, createTripContent(points[i]), 'beforeend');
-}
 
 //по клику на кнопку +NEW EVENT показывать форму добавления,
 //по клику на форме добавления на cancel удалять элемент из разметки
 
 const buttonAdd = document.querySelector('.trip-main__event-add-btn');
-const buttonEdit = document.querySelector('.event__rollup-btn');
 
 const cancelForm = () => {
   buttonAdd.disabled = true;
@@ -85,12 +58,45 @@ const cancelForm = () => {
 
 buttonAdd.onclick = () =>
 {
-  render(siteNewPoint, createNewPoint(), 'afterbegin');
+
+  renderElement(siteNewPoint, new AddEditView(null).getElement(), 'afterbegin');
   cancelForm();
 };
 
-buttonEdit.onclick = () =>
-{
-  render(siteNewPoint,createNewPoint(points[0]),'afterbegin');
-  cancelForm();
+const renderPoint = (point) => {
+  const pointComponent = new TripContentView(point);
+  const pointEditComponent = new AddEditView(point);
+
+  const replaceCardToForm = () => {
+    buttonAdd.disabled = true;
+    siteNewPoint.replaceChild(pointEditComponent.getElement(), pointComponent.getElement());
+  };
+
+  const replaceFormToCard = () => {
+    buttonAdd.disabled = false;
+    siteNewPoint.replaceChild(pointComponent.getElement(), pointEditComponent.getElement());
+  };
+
+  pointComponent.getElement().querySelector('.event__rollup-btn').addEventListener('click', () => {
+    replaceCardToForm();
+  });
+
+
+  pointEditComponent.getElement().querySelector('form').addEventListener('reset', () => {
+    replaceFormToCard();
+  });
+
+  pointEditComponent.getElement().querySelector('form').addEventListener('submit', (evt) => {
+    evt.preventDefault();
+    replaceFormToCard();
+  });
+
+  renderElement(siteNewPoint, pointComponent.getElement(), RenderPosition.BEFOREEND);
+
 };
+
+
+for (let i=0;i<POINTS_COUNT;i++){
+  renderPoint(points[i]);
+  //renderElement(siteNewPoint, new TripContentView(points[i]).getElement(), RenderPosition.BEFOREEND);
+}
