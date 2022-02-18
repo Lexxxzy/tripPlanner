@@ -13,24 +13,23 @@ import { createElement } from '../utils.js';
 корректно отображался с «пустыми» данными.
 
  */
-const createNewPoint = (point = {}) => {
+const createNewPoint = (point) => {
   const {
-    tripType = 'Taxi',
-    destination = 'Venice',
-    offers = generateOffers(),
-    description = generateDescription(),
-    price = getRandomInteger(50, 500),
-    dateFrom= '11 Feb',
-    dateTo= '12 Feb',
-    dateFromFormatted= '11 Feb',
-    dateFromForm= '11/02/2022 00:00',
-    dateToForm= '12/02/2022 00:00',
-    fromTime= 'HH:mm',
-    toTime= 'HH:mm',
-    timeInPoint= '1H 12M',
-    isFavorite= Boolean(getRandomInteger(0,1)),
+    tripType,
+    destination,
+    offers,
+    description,
+    price,
+    dateFrom,
+    dateTo,
+    dateFromFormatted,
+    dateFromForm,
+    dateToForm,
+    fromTime,
+    toTime,
+    timeInPoint,
+    isFavorite,
   } = point;
-
   return (`<li class="trip-events__item">
 <form class="event event--edit" action="#" method="post">
   <header class="event__header">
@@ -163,17 +162,49 @@ const createNewPoint = (point = {}) => {
 
 
 export default class NewPoint{
-  constructor() {
+  constructor(point) {
     this._element = null;
+    this.point = point;
+    if(this.point===null){
+      this.point = {
+        tripType: 'Taxi',
+        destination: 'Amsterdam',
+        offers: [{
+          name:'Order Uber',
+          price: 50,
+        },
+        {
+          name: 'Rent a car',
+          price: 150,
+        },
+        {
+          name:'Add breakfast',
+          price: 30,
+        },
+        {
+          name:'Lunch in city',
+          price: 50,
+        },
+        {
+          name:'Switch to comfort',
+          price: 200,
+        },
+        ],
+        description: generateDescription(),
+        price: 100,
+        dateFromForm: '01/01/22 00:00',
+        dateToForm: '02/01/22 00:00',
+      };
+    }
   }
 
-  getTemplate(point = {}) {
-    return createNewPoint(point = {});
+  getTemplate() {
+    return createNewPoint(this.point);
   }
 
-  getElement(point = {}) {
+  getElement() {
     if (!this._element) {
-      this._element = createElement(this.getTemplate(point = {}));
+      this._element = createElement(this.getTemplate());
     }
 
     return this._element;
