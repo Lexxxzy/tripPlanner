@@ -1,4 +1,4 @@
-import { createElement } from '../utils';
+import AbstractView from './abstract.js';
 /*Меню сайта*/
 
 const createMenuInfo = () => (
@@ -7,24 +7,9 @@ const createMenuInfo = () => (
   <a class="trip-tabs__btn" href="#">Stats</a>`
 );
 
-export default class SiteMenu {
-  constructor() {
-    this._element = null;
-  }
+export default class SiteMenu extends AbstractView {
 
   getTemplate() {
     return createMenuInfo();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
